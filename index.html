@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>.nms to .md Converter</title>
+    <link rel="stylesheet" href="stylesheets/main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>.nms to mkdocs Converter</h1>
+        <div id="upload-area" class="upload-area">
+            <p>Upload or drag your <strong>.nms</strong> file here</p>
+            <input type="file" id="nms-file" accept=".nms">
+        </div>
+        <form id="meta-form" class="hidden">
+            <label>Name: <input type="text" name="name" required></label>
+            <label>Author: <input type="text" name="author" required></label>
+            <label>Description: <input type="text" name="description"></label>
+            <label>
+                <input type="checkbox" id="has-deps"> Has dependencies
+            </label>
+            <div id="deps-list" class="hidden">
+                <div class="dep-row">
+                    <input type="text" name="dependency[]" placeholder="Dependency">
+                    <button type="button" class="add-dep">+</button>
+                </div>
+            </div>
+            <fieldset>
+                <legend>Tags</legend>
+                <label><input type="checkbox" name="mapping"> Mapping</label>
+                <label><input type="checkbox" name="scripting"> Scripting</label>
+                <label>
+                    <input type="checkbox" id="github-check"> Github
+                </label>
+                <input type="text" id="github-url" name="github-url" class="hidden" placeholder="Github URL">
+                <label>
+                    <input type="checkbox" id="website-check"> Website
+                </label>
+                <input type="text" id="website-url" name="website-url" class="hidden" placeholder="Website URL">
+            </fieldset>
+            <button type="button" id="convert-btn">Convert</button>
+        </form>
+        <button id="download-btn" class="hidden">Download Converted File</button>
+    </div>
+    <script src="src/main.js"></script>
+</body>
+</html>
