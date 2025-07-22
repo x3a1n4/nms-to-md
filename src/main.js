@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const githubUrl = document.getElementById('github-url');
     const websiteCheck = document.getElementById('website-check');
     const websiteUrl = document.getElementById('website-url');
+    const filePreview = document.getElementById('file-preview');
 
     // Drag & drop
     uploadArea.addEventListener('dragover', (e) => {
@@ -26,11 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (files.length && files[0].name.endsWith('.nms')) {
             fileInput.files = files;
             showForm();
+            showPreview(files[0]);
         }
     });
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length && fileInput.files[0].name.endsWith('.nms')) {
             showForm();
+            showPreview(fileInput.files[0]);
         }
     });
 
@@ -39,17 +42,38 @@ document.addEventListener('DOMContentLoaded', () => {
         metaForm.classList.remove('hidden');
     }
 
+    function showPreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            filePreview.innerHTML = `
+                <div id="file-preview-header">${file.name}</div>
+                <pre>${e.target.result.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
+            `;
+            filePreview.classList.remove('hidden');
+        };
+        reader.readAsText(file);
+    }
+
     // Dependencies
     hasDeps.addEventListener('change', () => {
         depsList.classList.toggle('hidden', !hasDeps.checked);
     });
+
     depsList.addEventListener('click', (e) => {
-        if (e.target.classList.contains('add-dep')) {
+        if (e.target.classList.contains('add-dep-list')) {
             const row = document.createElement('div');
             row.className = 'dep-row';
             row.innerHTML = `<input type="text" name="dependency[]" placeholder="Dependency">
-                             <button type="button" class="add-dep">+</button>`;
-            depsList.appendChild(row);
+                             <button type="button" class="remove-dep">-</button>`;
+            depsList.insertBefore(row, e.target);
+        }
+        if (e.target.classList.contains('remove-dep')) {
+            const row = e.target.parentElement;
+            if (depsList.querySelectorAll('.dep-row').length > 1) {
+                depsList.removeChild(row);
+            } else {
+                row.querySelector('input').value = '';
+            }
         }
     });
 

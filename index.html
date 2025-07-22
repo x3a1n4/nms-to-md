@@ -8,6 +8,7 @@
 <body>
     <div class="container">
         <h1>.nms to mkdocs Converter</h1>
+        <div id="file-preview" class="hidden"></div>
         <div id="upload-area" class="upload-area">
             <p>Upload or drag your <strong>.nms</strong> file here</p>
             <input type="file" id="nms-file" accept=".nms">
@@ -22,11 +23,12 @@
             <div id="deps-list" class="hidden">
                 <div class="dep-row">
                     <input type="text" name="dependency[]" placeholder="Dependency">
-                    <button type="button" class="add-dep">+</button>
+                    <button type="button" class="remove-dep">-</button>
                 </div>
+                <button type="button" class="add-dep-list">+</button>
             </div>
             <fieldset>
-                <legend>Tags</legend>
+                <legend><h3>Tags</h3></legend>
                 <label><input type="checkbox" name="mapping"> Mapping</label>
                 <label><input type="checkbox" name="scripting"> Scripting</label>
                 <label>
