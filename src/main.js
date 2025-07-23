@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 depsList.removeChild(row);
             } else {
                 row.querySelector('input').value = '';
+                // Uncheck "Has dependencies" if last row is removed
+                hasDeps.checked = false;
+                depsList.classList.add('hidden');
             }
         }
     });
@@ -87,6 +90,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Convert button
     convertBtn.addEventListener('click', () => {
+        let valid = true;
+        // Required fields
+        const requiredFields = [
+            metaForm.querySelector('input[name="name"]'),
+            metaForm.querySelector('input[name="author"]'),
+            metaForm.querySelector('input[name="description"]')
+        ];
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('required-highlight');
+                valid = false;
+            } else {
+                field.classList.remove('required-highlight');
+            }
+        });
+
+        // If has dependencies, check each dependency input
+        if (hasDeps.checked) {
+            const depInputs = depsList.querySelectorAll('input[name="dependency[]"]');
+            depInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    input.classList.add('required-highlight');
+                    valid = false;
+                } else {
+                    input.classList.remove('required-highlight');
+                }
+            });
+        }
+
+        // If Github checked, check github-url
+        if (githubCheck.checked && !githubUrl.value.trim()) {
+            githubUrl.classList.add('required-highlight');
+            valid = false;
+        } else {
+            githubUrl.classList.remove('required-highlight');
+        }
+        // If Website checked, check website-url
+        if (websiteCheck.checked && !websiteUrl.value.trim()) {
+            websiteUrl.classList.add('required-highlight');
+            valid = false;
+        } else {
+            websiteUrl.classList.remove('required-highlight');
+        }
+
+        if (!valid) return;
+
         // You will define convert_to_md()
         if (typeof convert_to_md === 'function') {
             convert_to_md().then(blob => {
@@ -105,4 +154,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    // Remove highlight when user types
+    metaForm.addEventListener('input', (e) => {
+        if (e.target.classList.contains('required-highlight') && e.target.value.trim()) {
+            e.target.classList.remove('required-highlight');
+        }
+    });
 });
+
+function convert_to_md() {
+    // Load the file data
+    const fileData = filePreview.querySelector('pre').textContent;
+    
+    // Find matching @namespace [name] @endnamespace pairs
+    const matches = fileData.matchAll(/@namespace\s+(.*?)\s+@endnamespace/gs);
+    const namespaces = [];
+    for (const match of matches) {
+        namespaces.push(match[1]);
+    }
+}

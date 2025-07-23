@@ -118,3 +118,7 @@ fieldset {
 .add-dep-list:hover {
     background: #005fa3;
 }
+.required-highlight {
+    border: 2px solid #e74c3c !important;
+    background: #fff0f0;
+}
