@@ -37,8 +37,7 @@ const allowedNameRegExp = /^[a-z][a-zA-Z0-9_]*$/;
 const firstLineCommentRegExp = /^\s*#(?:.*\()?(\s*,?\s*([a-zA-Z][a-zA-Z0-9_]*::)?[A-Z][a-zA-Z0-9_]*(\[\])?\s+[a-z][a-zA-Z0-9_]*)+(?:\s*\))?\s*$/;
 
 
-export function parseNamespaceFile(text: string, namespaceStorage: Map<string, NamespaceInfo>,
-	classStorage: Map<string, ClassInfo>) {
+export function parseNamespaceFile(text: string, namespaceStorage: Map<string, NamespaceInfo>, classStorage: Map<string, ClassInfo>) {
 	const lines = text.split(newLineRegExp);
 	for (let i = 0; i < lines.length; i++) {
 		const regExpRes = namespaceSignatureRegExp.exec(lines[i]);

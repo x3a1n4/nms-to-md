@@ -1,4 +1,4 @@
-import {parseDocument} from '../out/parser/parser.js';
+import {parseNamespaceFile} from '../out/parser/parser.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const uploadArea = document.getElementById('upload-area');
@@ -180,8 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
         //      a file in each namespace subfolder for each class in the namespace called [classname].md
 
         // parse file
-        const parsed = parseDocument(fileData);
-        console.log(parsed);
+        let namespaceStorage = new Map();
+        let classStorage = new Map();
+        parseNamespaceFile(fileData, namespaceStorage, classStorage);
+        console.log(namespaceStorage);
+        console.log(classStorage);
         // convert to md
     }
 });
