@@ -1,3 +1,5 @@
+import { parseDocument } from '../out/parser/parser.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const uploadArea = document.getElementById('upload-area');
     const fileInput = document.getElementById('nms-file');
@@ -164,13 +166,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function convert_to_md() {
+    console.log("converting file!");
     // Load the file data
     const fileData = filePreview.querySelector('pre').textContent;
-    
-    // Find matching @namespace [name] @endnamespace pairs
-    const matches = fileData.matchAll(/@namespace\s+(.*?)\s+@endnamespace/gs);
-    const namespaces = [];
-    for (const match of matches) {
-        namespaces.push(match[1]);
-    }
+
+    // output: a folder with the name of the project containing the following
+    // if only one namespace: 
+    //      a file in the top-level folder called index.md
+    //      a file in the top-level folder for each class called [classname].md
+    // if multiple namespaces:
+    //      a file in the top-level folder called index.md
+    //      a subfolder for each namespace
+    //      a file in each namespace subfolder called index.md
+    //      a file in each namespace subfolder for each class in the namespace called [classname].md
+
+    // parse file
+    const parsed = parseDocument(fileData);
+    console.log(parsed);
+    // convert to md
 }
