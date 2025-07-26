@@ -10,6 +10,7 @@ export interface VariableInfo {
 export interface MemberInfo {
 	name: string
 	returnType: string
+	args: string | undefined
 	documentation: string | undefined
 }
 export interface NamespaceInfo {
@@ -141,16 +142,20 @@ function parseVariableOrFunctionAtLine(namePrefix: string, lines: string[], line
 	const result: MemberInfo = {
 		returnType: '',
 		name: '',
+		args: '',
 		documentation: undefined
 	};
 
 	if (functionRegExpRes !== null) {
-		result.name = functionRegExpRes[2] + '()';
+		console.log(functionRegExpRes);
+		result.name = functionRegExpRes[2] + `${functionRegExpRes[3]}`;
 		result.returnType = functionRegExpRes[1];
+		result.args = functionRegExpRes[3];
 	}
 	else if (constructorRegExpRes !== null) {
-		result.name = constructorRegExpRes[1] + '()';
+		result.name = constructorRegExpRes[1] + `${constructorRegExpRes[2]}`;
 		result.returnType = constructorRegExpRes[1];
+		result.args = constructorRegExpRes[2];
 	}
 	else if (variableRegExpRes !== null) {
 		result.name = variableRegExpRes[6];
