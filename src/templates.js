@@ -63,7 +63,7 @@ function parseDependencies(dependencies) {
 
 function parseTags(tags) {
     // <!-- minrdocs:scripting --> <!-- minrdocs:msc --> <!-- minrdocs:github https://github.com/x3a1n4/minr -->
-    return tags.map(tag => `<!-- minrdocs:${tag.tag}${tag.text ? ' ${tag.text}' : ''} -->`).join(' ');
+    return tags.map(tag => `<!-- minrdocs:${tag.tag}${tag.text ? ` ${tag.text}` : ''} -->`).join(' ');
 }
 
 function parseDocs(object) {
@@ -89,7 +89,7 @@ function toTable(object) {
 
 function toClassTable(object) {
     return Object.entries(object).map(([name, entries], i) => {
-        return `| [\`${name}\`](${entries["name"]}.md) | No description |`;
+        return `| [\`${name}\`](${name}.md) | No description |`;
     }).join('\n');
 }
 
