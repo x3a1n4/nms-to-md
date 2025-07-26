@@ -4,7 +4,7 @@ function parseClass(classObject) {
     for (const [membername, memberObject] of classObject.members){
         let combinedName = memberObject.returnType + " " + membername;
 
-        if (memberObject.returnType == membername.split('::')[1]) {
+        if (memberObject.returnType == membername) {
             // it's a constructor!
             out["constructors"][combinedName] = memberObject.documentation;
         }
@@ -66,6 +66,33 @@ function parseTags(tags) {
     return tags.map(tag => `<!-- minrdocs:${tag.tag}${tag.text ? ' ${tag.text}' : ''} -->`).join(' ');
 }
 
+function parseDocs(object) {
+    // get if documentation exists, otherwies return empty string
+    if (typeof object === 'undefined') {
+        return "No documentation";
+    }
+
+    return object;
+}
+
+function toNamespaceList(object) {
+    return Object.entries(object).map(([name, members], i) => {
+        return `- [\`${name}\`](${name}/index.md)`;
+    }).join('\n')
+}
+
+function toTable(object) {
+    return Object.entries(object).map(([name, entries], i) => {
+        return `| \`[${name}\] | ${parseDocs(entries)} |`;
+    }).join('\n');
+}
+
+function toClassTable(object) {
+    return Object.entries(object).map(([name, entries], i) => {
+        return `| \`[${name}\](${entries["name"]}.md) | No description |`;
+    }).join('\n');
+}
+
 export function utilityIndexTemplate(name, author, description, dependencies, tags, storage){
     return `${parseTags(tags)}
 <!-- utilityinfo:name ${name} -->
@@ -77,14 +104,12 @@ ${parseDependencies(dependencies)}
 This is the default generated description for the namespace ${name}. Include code examples, screenshots, ect. here.
 
 ## Namespaces
-| Namespace                            | Description                    |
-| ------------------------------------ | ------------------------------ |
-${Object.entries(storage).map((namespace, members) => `| \`${namespace}\` | ${members["documentation"]} |`).join('\n')}
+${toNamespaceList(storage)}
 `;
 }
 
 export function namespaceIndexTemplate(name, author, description, dependencies, tags, storage) {
-    let out = parse(namespaceStorage, classStorage);
+    // console.log("Generating namespace index");
 
     return `${parseTags(tags)}
 <!-- utilityinfo:name ${name} -->
@@ -98,21 +123,22 @@ This is the default generated description for the namespace ${name}. Include cod
 ## Classes
 | Class                               | Description                    |
 | ----------------------------------- | ------------------------------ |
-${storage[name]["classes"].map((className, classObject) => `| \`[${className}\](${classObject["name"]}.md) | ${classObject["documentation"]} |`).join('\n')}
+${toClassTable(storage[name]["classes"])}
 
 ## Functions
 | Function                             | Description                                           |
 | ------------------------------------ | ----------------------------------------------------- |
-${storage[name]["functions"].map((functionName, functionObject) => `| \`${functionName}\` | ${functionObject["documentation"]} |`).join('\n')}
+${toTable(storage[name]["functions"])}
 
 ## Variables
 | Variable                                     | Description                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------ |
-${storage[name]["variables"].map((variableName, variableObject) => `| \`${variableName}\` | ${variableObject["documentation"]} |`).join('\n')}
+${toTable(storage[name]["variables"])}
 `;
 }
 
 export function namespaceTemplate(name, namespaceObject) {
+    // console.log("Generating namespace template");
     return `
 # ${name}
 This is the default generated description for the namespace ${name}. Include code examples, screenshots, ect. here.
@@ -120,21 +146,22 @@ This is the default generated description for the namespace ${name}. Include cod
 ## Classes
 | Class                               | Description                    |
 | ----------------------------------- | ------------------------------ |
-${Object.entries(namespaceObject["classes"]).map((className, classObject) => `| \`[${className}\](${classObject["name"]}.md) | ${classObject["documentation"]} |`).join('\n')}
+${toClassTable(namespaceObject["classes"])}
 
 ## Functions
 | Function                             | Description                                           |
 | ------------------------------------ | ----------------------------------------------------- |
-${Object.entries(namespaceObject["functions"]).map((functionName, functionObject) => `| \`${functionName}\` | ${functionObject["documentation"]} |`).join('\n')}
+${toTable(namespaceObject["functions"])}
 
 ## Variables
 | Variable                                     | Description                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------ |
-${Object.entries(namespaceObject["variables"]).map((variableName, variableObject) => `| \`${variableName}\` | ${variableObject["documentation"]} |`).join('\n')}
+${toTable(namespaceObject["variables"])}
 `;
 }
 
 export function classTemplate(className, classObject){
+    // console.log("Generating class template");
     let out = parseClass(classObject);
     
     return `
@@ -144,16 +171,16 @@ This is the default generated description for the class ${className}. Include co
 ## Constructors
 | Constructor  | Description              |
 | ------------ | ------------------------ |
-${Object.entries(out["constructors"]).map((constructorName, constructorObject) => `| \`${constructorName}\` | ${constructorObject["documentation"]} |`).join('\n')}
+${toTable(out["constructors"])}
 
 ## Methods
 | Method                                                  | Description                                                                         |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-${Object.entries(out["methods"]).map((methodName, methodObject) => `| \`${methodName}\` | ${methodObject["documentation"]} |`).join('\n')}
+${toTable(out["methods"])}
 
 ## Fields
 | Field                                                  | Description                                                                                       |
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-${Object.entries(out["fields"]).map((fieldName, fieldObject) => `| \`${fieldName}\` | ${fieldObject["documentation"]} |`).join('\n')}
+${toTable(out["fields"])}
 `;
 }

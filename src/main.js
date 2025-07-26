@@ -178,7 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // get dependencies
         let dependencies = [];
         if (document.getElementById("has-deps").checked) {
-            dependencies = document.querySelectorAll('input[name="dependency[]"]').map(dep => dep.value);
+            dependencies = [...document.querySelectorAll('input[name="dependency[]"]')].map(dep => dep.value);
+            // console.log(dependencies);
         }
 
         // parse namespace
@@ -204,10 +205,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 dependencies, 
                 taglist, 
                 out));
+            /*
+            console.log(templates.namespaceIndexTemplate(
+                metaForm.querySelector('input[name="name"]').value, 
+                metaForm.querySelector('input[name="author"]').value, 
+                metaForm.querySelector('input[name="description"]').value, 
+                dependencies, 
+                taglist, 
+                out
+            ))
+            */
             
             // add classes
             for (const [className, classObject] of classStorage){
                 zip.file(`${className}.md`, templates.classTemplate(className, classObject));
+                //console.log(templates.classTemplate(className, classObject));
             }
 
             
@@ -219,16 +231,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 dependencies, 
                 taglist, 
                 out));
+            /*
+            console.log(templates.utilityIndexTemplate(
+                metaForm.querySelector('input[name="name"]').value, 
+                metaForm.querySelector('input[name="author"]').value, 
+                metaForm.querySelector('input[name="description"]').value, 
+                dependencies, 
+                taglist, 
+                out
+            ))
+            */
             
-            // console.log(Object.entries(out));
             for (const [name, namespace] of Object.entries(out)){
-                // console.log(namespace, name);
-                zip.folder(namespace).file("index.md", templates.namespaceTemplate(name, namespace));
-                
-                console.log(name, namespace);
+                //console.log(name, namespace);
+                zip.folder(name).file("index.md", templates.namespaceTemplate(name, namespace));
+                //console.log(templates.namespaceTemplate(name, namespace));
+
                 // add classes
                 for (const [className, classObject] of Object.entries(namespace["classes"])){
-                    zip.folder(namespace).file(`${className}.md`, templates.classTemplate(className, classObject));
+                    zip.folder(name).file(`${className}.md`, templates.classTemplate(className, classObject));
+                    //console.log(templates.classTemplate(className, classObject));
                 }
             }
         }
