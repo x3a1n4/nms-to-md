@@ -4,7 +4,7 @@ function parseClass(classObject) {
     for (const [membername, memberObject] of classObject.members){
         let combinedName = memberObject.returnType + " " + membername;
 
-        if (memberObject.returnType == membername) {
+        if (memberObject.returnType == membername.replace(/\(.*\)/g, '')) {
             // it's a constructor!
             out["constructors"][combinedName] = memberObject.documentation;
         }
@@ -83,13 +83,13 @@ function toNamespaceList(object) {
 
 function toTable(object) {
     return Object.entries(object).map(([name, entries], i) => {
-        return `| \`[${name}\] | ${parseDocs(entries)} |`;
+        return `| \`${name}\` | ${parseDocs(entries)} |`;
     }).join('\n');
 }
 
 function toClassTable(object) {
     return Object.entries(object).map(([name, entries], i) => {
-        return `| \`[${name}\](${entries["name"]}.md) | No description |`;
+        return `| [\`${name}\`](${entries["name"]}.md) | No description |`;
     }).join('\n');
 }
 
