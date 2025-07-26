@@ -1,4 +1,5 @@
 import {parseNamespaceFile} from '../out/parser/parser.js';
+import * as templates from './templates.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const uploadArea = document.getElementById('upload-area');
@@ -137,24 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!valid) return;
-
-        // You will define convert_to_md()
-        if (typeof convert_to_md === 'function') {
-            convert_to_md().then(blob => {
-                // Show download button
-                downloadBtn.classList.remove('hidden');
-                downloadBtn.onclick = () => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'converted.md';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                };
-            });
-        }
+        
+        convert_to_md();
     });
 
     // Remove highlight when user types
@@ -182,10 +167,77 @@ document.addEventListener('DOMContentLoaded', () => {
         // parse file
         let namespaceStorage = new Map();
         let classStorage = new Map();
+
+        // get taglist, in format tag = {tag: "tagname", text: "text"}
+        let taglist = [];
+        if (document.getElementsByName("mapping")[0].checked) {taglist.push({tag: "mapping", text: ""});}
+        if (document.getElementsByName("scripting")[0].checked) {taglist.push({tag: "scripting", text: ""});}
+        if (document.getElementById("github-check").checked) {taglist.push({tag: "github", text: document.getElementById("github-url").value});}
+        if (document.getElementById("website-check").checked) {taglist.push({tag: "website", text: document.getElementById("website-url").value});}
+
+        // get dependencies
+        let dependencies = [];
+        if (document.getElementById("has-deps").checked) {
+            dependencies = document.querySelectorAll('input[name="dependency[]"]').map(dep => dep.value);
+        }
+
+        // parse namespace
         parseNamespaceFile(fileData, namespaceStorage, classStorage);
-        console.log(namespaceStorage);
-        console.log(classStorage);
-        // convert to md
+        // parse to format
+        let out = templates.parse(namespaceStorage, classStorage);
+        console.log(out);
+        
+        // error if no namespaces
+        if (namespaceStorage.size == 0){
+            alert("No namespaces found!");
+            return;
+        }
+        
+        // create file structure
+        var zip = new JSZip();
+        // if only one namespace
+        if (namespaceStorage.size === 1) {
+            zip.file("index.md", templates.namespaceIndexTemplate(
+                metaForm.querySelector('input[name="name"]').value, 
+                metaForm.querySelector('input[name="author"]').value, 
+                metaForm.querySelector('input[name="description"]').value, 
+                dependencies, 
+                taglist, 
+                out));
+            
+            // add classes
+            for (const [className, classObject] of classStorage){
+                zip.file(`${className}.md`, templates.classTemplate(className, classObject));
+            }
+
+            
+        }else{
+            zip.file("index.md", templates.utilityIndexTemplate(
+                metaForm.querySelector('input[name="name"]').value, 
+                metaForm.querySelector('input[name="author"]').value, 
+                metaForm.querySelector('input[name="description"]').value, 
+                dependencies, 
+                taglist, 
+                out));
+            
+            // console.log(Object.entries(out));
+            for (const [name, namespace] of Object.entries(out)){
+                // console.log(namespace, name);
+                zip.folder(namespace).file("index.md", templates.namespaceTemplate(name, namespace));
+                
+                console.log(name, namespace);
+                // add classes
+                for (const [className, classObject] of Object.entries(namespace["classes"])){
+                    zip.folder(namespace).file(`${className}.md`, templates.classTemplate(className, classObject));
+                }
+            }
+        }
+
+        zip.generateAsync({type:"blob"})
+            .then(function(content) {
+                // see FileSaver.js
+                saveAs(content, `${metaForm.querySelector('input[name="name"]').value}.zip`);
+            });
     }
 });
 
