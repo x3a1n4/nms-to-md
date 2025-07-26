@@ -172,6 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let taglist = [];
         if (document.getElementsByName("mapping")[0].checked) {taglist.push({tag: "mapping", text: ""});}
         if (document.getElementsByName("scripting")[0].checked) {taglist.push({tag: "scripting", text: ""});}
+        if (document.getElementsByName("msc")[0].checked) {taglist.push({tag: "msc", text: ""});}
+        if (document.getElementsByName("non-msc")[0].checked) {taglist.push({tag: "non_msc", text: ""});}
         if (document.getElementById("github-check").checked) {taglist.push({tag: "github", text: document.getElementById("github-url").value});}
         if (document.getElementById("website-check").checked) {taglist.push({tag: "website", text: document.getElementById("website-url").value});}
 
